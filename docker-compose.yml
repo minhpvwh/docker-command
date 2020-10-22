@@ -1,0 +1,42 @@
+version: "3"
+
+#NETWORK
+networks:
+  my-network:
+    driver: bridge
+
+#VOLUMES
+volumes:
+  dir-site:
+    driver_opts:
+      device: ./
+      o: bind
+
+services:
+  # container PHP
+  my-php:
+    container_name: php-product
+    build:
+      dockerfile: Dockerfile
+      context: ./php/
+    hostname: php
+    restart: always
+    networks:
+      - my-network
+    volumes:
+      - dir-site:/home/sites/
+  # container httpd
+  my-httpd:
+    container_name: c-httpd01
+    image: "httpd:lastest"
+    hostname: httpd
+    restart: always
+    networks:
+      - my-network
+    volumes:
+      - dir-site:/home/sites/
+      - ./httpd.conf:/usr/local/apache2/conf/httpd.conf
+    ports:
+      - "9999:80"
+      - "443:443"
+# docker-compose up
